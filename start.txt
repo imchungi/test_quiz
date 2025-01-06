@@ -1,0 +1,144 @@
+mkdir quiz_test
+python -m venv venv
+pip install django djangorestframework
+django-admin startproject myapi .
+python manage.py startapp quiz
+
+setting ->
+ALLOWED_HOSTS = ['*']
+
+TIME_ZONE = 'Asis/Seoul'
+
+STATIC_URL = 'static/'
+STATIC_ROOR = os.path.join(BASE_DIR, 'staticfiles')
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'quiz',
+    'rest_framework'
+]
+
+//->
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+
+//=>
+quiz/models.py
+class Quiz(models.Model):
+    title = models.CharField(max_length=200)
+    body = models.TextField()
+    answer = models.IntegerField()
+
+//=>
+quiz/serializers.py
+class QuizSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = Quiz
+        fields = ('title', 'body', 'answer')
+
+
+//=>
+quiz/views.py
+from django.shortcuts import render
+#
+from  rest_framework.response import Response
+from  rest_framework.decorators import api_view
+from .models import Quiz
+from .serializers import QuizSerializer
+# Create your views here.
+@api_view(['GET'])
+def helloApi(request):
+    return Response('Hellow Api world')
+
+//=>
+quiz/urls.py
+from django.urls import path, include
+from .views import helloApi
+
+urlpatterns = [
+    path["hello/", helloApi]
+]
+
+//=>
+myapi/urls.py
+from django.contrib import admin
+from django.urls import path,include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('quiz/', include('quiz.urls'))
+]
+
+# server 오류시 restart
+
+// views , urls
+@api_view(['GET'])
+def helloApi(request):
+    return Response('Hello Api world')
+
+@api_view(['GET'])
+def randomeQuiz(request, id):
+    totalQuizs = Quiz.objects.all()
+    randomeQuiz = random.sample(list(totalQuizs), id)
+    serializer = QuizSerializer(randomeQuiz, many=True)
+    return Response(serializer.data)
+
+//=>
+quiz/urls.py
+urlpatterns = [
+    path("hello/", helloApi),
+    path("<int:id>/", randomQuiz)
+]
+
+
+
+
+//admin
+from django.contrib import admin
+from .models import Quiz
+
+# Register your models here.
+admin.site.register(Quiz)
+
+//migration
+ python manage.py makemigrations
+python manage.py migrate
+
+//super 유저 , 관리자 admin
+test
+test@test.com
+pwd: test
+//
+python manage.py runserver
+
+http://127.0.0.1:8000/admin
+편집후 확인
+http://127.0.0.1:8000/quiz/2/
+
+//히로쿠 설치 위한 파일 설치
+pip install django-cors-headers gunicorn psycopg2-binary whitenoise
+
+//https://dashboard.heroku.com/apps
+
+//pip freeze > requirements.txt
+
+//setting
+'whitenoise.middleware.WhiteNoiseMiddleware',
+
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
+
+등 생성 하고 . 루트에서 히로쿠 필요파일들 만든다.
+
+Procfile
+runtime
+.gitignore
+
+히로크 cli 설치
